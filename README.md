@@ -23,14 +23,14 @@ Adam 2.0 (command line tool `adam2`) has three sets of command line options used
 - `--input` or `-i` - specifies the input FASTA file containing sequences for oligo design **(required argument)**
 - `--output` or `-o` - specifies the output file prefix **(required argument)**
 
-# Design options
+### Design options
 - `--size` or `-s` - desired oligo size range, must provide min and max **(required argument)**
 - `--tm` or `-t` - desired oligo Tm range in degrees C, must provide min and max **(required argument)**
 - `--hairpin` or `-p` - hairpin tolerance in degrees C, default = 10
 - `--homodimer` or `-d` - homodimer tolerance in degrees C, default = 10
 - `--number` or `-n` - number of oligos to generate per input sequence, default = 10
 
-# Pruning options
+### Pruning options
 - `--length` - length penalty for oligo scoring, default = 0.5
 - `--gc_ends` - GC ends reward for oligo scoring, default = 1
 - `--gc_comp` - GC composition penalty for oligo scoring, default = 2
@@ -38,7 +38,7 @@ Adam 2.0 (command line tool `adam2`) has three sets of command line options used
 - `--hairpin_tm` - hairpin Tm suppression reward for oligo scoring, default = 0.1
 - `--homodimer_tm` - homodimer Tm suppression reward for oligo scoring, default = 0.1
 
-# Tm calculation parameters
+### Tm calculation parameters
 - `--dna_conc` - DNA concentration to use for Tm calculation, default = 250
 - `--mv_conc` - monovalent cation concentration to use for Tm calculation, default = 50
 - `--dv_conc` - divalent cation concentration to use for Tm calculation, default = 0
