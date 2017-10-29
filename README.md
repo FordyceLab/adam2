@@ -17,9 +17,23 @@ Adam 2.0 is a design utility for hybridization oligos. Given a pool of sequences
 9. Prune the oligo pool to a single representative oligo based on pruning properties
 10. Report the hybridization oligos in a machine/human readable format
 
+## Installation
+
+Adam 2.0 requires Python 3.
+
+Installation is as easy as:
+
+```
+git clone https://github.com/FordyceLab/adam2.git
+cd adam2
+pip3 install .
+```
+
+This will make the `adam2` command line tool publicly available. You can check this with `which adam2`, which should not return a blank line.
+
 ## How to use it
 
-Adam 2.0 (command line tool `adam2`) has three sets of command line options used to alter its behavior:
+Adam 2.0 (command line tool `adam2`) takes a requires set of IO/ parameters and has three sets of command line options used to alter its behavior:
 
 ### I/O flags
 - `--input` or `-i` - specifies the input FASTA file containing sequences for oligo design **(required argument)**
@@ -45,3 +59,68 @@ Adam 2.0 (command line tool `adam2`) has three sets of command line options used
 - `--mv_conc` - monovalent cation concentration to use for Tm calculation, default = 50
 - `--dv_conc` - divalent cation concentration to use for Tm calculation, default = 0
 - `--dntp_conc` - dNTP concentration to use for Tm calculation, default = 0
+
+## Example
+
+Let's say we have the following FASTA file (named `species.fasta` on disk) containing a variable region for two species below:
+
+```
+>Species_A
+ACGTTGACAGGATTACACAGTAGATCCAGGATTATAGGACCAGGTAGCA
+
+>SpeciesB
+ACGTTTGACGTTGTACACAGTAGAGGCTAGGATTAGGTACCAGGTAGCA
+```
+
+We want to design a set of oligos to separate these sequences with the following parameters:
+
+- max of 3 potential oligos designed per species
+- length of 18-25 nt
+- Tm of 55-60C
+
+We can accomplish this using the following command:
+
+```
+adam2 -i species.fasta -o species -n 3 -s 18 25 -t 55 60 
+```
+
+This command will generate the following YAML file (in this case named `species.yaml`):
+
+```
+design_params:
+    k: 9
+    size_range: (18, 25)
+    Tm_range: (55.0, 60.0)
+    hairpin_tolerance: 10
+    homodimer_tolerance: 10
+prune_params:
+    GC_ends: 1
+    GC_comp: 2
+    Tm_mean: 1
+    hairpin_Tm: 0.1
+    homodimer_Tm: 0.1
+Species_A:
+    ACGTTGACAGGATTACACAGTAGAT:
+        length: 25
+        Tm: 55.39
+        start: 0
+        end: 24
+        hairpin_Tm: 0.0
+        homodimer_Tm: -46.54
+SpeciesB:
+    CGTTTGACGTTGTACACAGTAGAG:
+        length: 24
+        Tm: 55.69
+        start: 1
+        end: 24
+        hairpin_Tm: 32.83
+        homodimer_Tm: -11.0
+    CACAGTAGAGGCTAGGATTAGGTAC:
+        length: 25
+        Tm: 55.11
+        start: 15
+        end: 39
+        hairpin_Tm: 0.0
+        homodimer_Tm: -31.25
+```
+
