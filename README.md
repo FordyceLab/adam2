@@ -1,5 +1,7 @@
 # Adam 2.0 - Hybridization Oligo Design Utility
 
+![Adam 2.0](./adam2.png)
+
 ## How it works
 
 Adam 2.0 is a design utility for hybridization oligos. Given a pool of sequences, provided as a file in FASTA format, the utility outputs putative identification primers that meet the user's design specifications. The program uses k-mer based approach that works in the following way:

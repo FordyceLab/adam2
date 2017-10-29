@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+
+from adam2.adam2 import TargetSet
+import argparse
+from Bio import SeqIO
+
+parser = argparse.ArgumentParser(description='Design identification oligos')
+
+# I/O flags
+parser.add_argument('--input', '-i', type=str, action='store', metavar='FILE',
+                    required=True, help='input FASTA file containing sequences for oligo design')
+parser.add_argument('--output', '-o', type=str, action='store', metavar='FILE',
+                    required=True, help='output file prefix')
+
+# Design options
+parser.add_argument('--size', '-s', nargs=2, type=int, action='store', metavar='N',
+                    required=True, help='(design) desired oligo size range, must provide min and max')
+parser.add_argument('--tm', '-t', nargs=2, type=float, action='store', metavar='N',
+                    required=True, help='(design) desired oligo Tm range in degrees C, must provide min and max')
+parser.add_argument('--hairpin', '-p', type=float, default=10, action='store', metavar='N',
+                    help='(design) hairpin tolerance in degrees C, default = 10')
+parser.add_argument('--homodimer', '-d', type=float, default=10, action='store', metavar='N',
+                    help='(design) homodimer tolerance in degrees C, default = 10')
+parser.add_argument('--number', '-n', type=int, default=10, action='store', metavar='N',
+                    help='(design) number of oligos to generate per input sequence, default = 10')
+
+# Pruning options
+parser.add_argument('--length', type=float, action='store', default=0.5, metavar='N',
+                    help='(pruning) length penalty for oligo scoring, default = 0.5')
+parser.add_argument('--gc_ends', type=float, action='store', default=1, metavar='N',
+                    help='(pruning) GC ends reward for oligo scoring, default = 1')
+parser.add_argument('--gc_comp', type=float, action='store', default=2, metavar='N',
+                    help='(pruning) GC composition penalty for oligo scoring, default = 2')
+parser.add_argument('--tm_mean', type=float, action='store', default=1, metavar='N',
+                    help='(pruning) Tm mean penalty for oligo scoring, default = 1')
+parser.add_argument('--hairpin_tm', type=float, action='store', default=0.1, metavar='N',
+                    help='(pruning) hairpin Tm suppression reward for oligo scoring, default = 0.1')
+parser.add_argument('--homodimer_tm', type=float, action='store', default=0.1, metavar='N',
+                    help='(pruning) homodimer Tm suppression reward for oligo scoring, default = 0.1')
+
+# Tm calculation parameters
+parser.add_argument('--dna_conc', type=float, action='store', default=250, metavar='N',
+                    help='(Tm calculation) DNA concentration to use for Tm calculation, default = 250')
+parser.add_argument('--mv_conc', type=float, action='store', default=50, metavar='N',
+                    help='(Tm calculation) monovalent cation concentration to use for Tm calculation, default = 50')
+parser.add_argument('--dv_conc', type=float, action='store', default=0, metavar='N',
+                    help='(Tm calculation) divalent cation concentration to use for Tm calculation, default = 0')
+parser.add_argument('--dntp_conc', type=float, action='store', default=0, metavar='N',
+                    help='(Tm calculation) dNTP concentration to use for Tm calculation, default = 0')
+
+
+if __name__ == '__main__':
+
+    args = parser.parse_args()
+
+    sequences = [record for record in SeqIO.parse(args.input, 'fasta')]
+
+    seq_set = TargetSet(sequences, size_range=(args.size[0], args.size[1]),
+                        tm_range=(args.tm[0], args.tm[1]),
+                        hairpin_tolerance=args.hairpin,
+                        homodimer_tolerance=args.homodimer)
+
+    seq_set.generate_oligos(args.number, dna_conc=args.dna_conc,
+                            mv_conc=args.mv_conc, dv_conc=args.dv_conc,
+                            dntp_conc=args.dntp_conc)
+
+    seq_set.prune_oligos(length=args.length, GC_ends=args.gc_ends,
+                         GC_comp=args.gc_comp, Tm_mean=args.tm_mean,
+                         hairpin_Tm=args.hairpin_tm,
+                         homodimer_Tm=args.homodimer_tm)
+
+    results = seq_set.report()
+
+    with open(args.output + '.yaml', 'w') as report_file:
+        report_file.write(results)
