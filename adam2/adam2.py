@@ -151,7 +151,7 @@ class TargetSeq():
                 length_score = -length * (len(oligo.seq) - self.size_range[0])
                 gc_end_score = GC_ends * (float(oligo.seq.startswith(('C', 'G'))) +
                                           float(oligo.seq.endswith(('C', 'G'))))
-                gc_comp_score = -GC_comp * abs((oligo.seq.count('G') + oligo.seq.count('G') / len(oligo.seq))- 0.5)
+                gc_comp_score = -GC_comp * abs((oligo.seq.count('G') + oligo.seq.count('C') / len(oligo.seq))- 0.5)
                 tm_mean_score = -Tm_mean * abs(oligo.Tm - (self.tm_range[0] + self.tm_range[1] / 2))
                 hairpin_tm_score = hairpin_Tm * abs(self.hairpin_tolerance - oligo.hairpin_Tm)
                 homodimer_tm_score = homodimer_Tm * abs(self.homodimer_tolerance - oligo.homodimer_Tm)
